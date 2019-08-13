@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <style>
+        input[type=radio] {
+            margin: 0;
+            width: 25px !important;
+            display: inline-block;
+            line-height: 25px;
+            height: 25px;
+            border: none !important;
+        }
+
+        input[type=number] {
+            margin: 0 auto;
+            width: 75px !important;
+            margin-top: 15px;
+        }
+
+        label {
+            display: inline-block;
+            max-width: 100%;
+            margin-bottom: 5px;
+            font-weight: 700;
+            line-height: 25px;
+            height: 25px;
+            vertical-align: text-bottom;
+            padding-left: 20px;
+        }
+
+        .text-center1 {
+            border-bottom: 1px solid gray;
+            margin-bottom: 10px;
+        }
+
+        .fill_button {
+            margin-top: 20px;
+        }
+
+        .matrix {
+            width: 100%;
+            display: none;
+            text-align: center;
+        }
+
+        .table > tbody > tr > td {
+            padding: 0;
+            border: 1px solid white;
+        }
+
+        .number {
+            width: 50px;
+            padding: 0 5px;
+            float: left;
+            text-align: center;
+            visibility: hidden;
+        }
+
+        .show-choice {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<div class="container choice">
+    <div class="row">
+        <div class="col-md-offset-3 col-md-3 col-lg-offset-3 col-lg-3 col-sm-offset-2 col-sm-4">
+            <div class="text-center text-center1">
+                <label>Clockwise</label>
+            </div>
+            <label for="left-upper-clockwise">Left Upper Corner</label>
+            <input type="radio" class="form-control pull-right" id="left-upper-clockwise" name="corner1" checked><br>
+            <label for="right-upper-clockwise">Right Upper Corner</label>
+            <input type="radio" class="form-control pull-right" id="right-upper-clockwise" name="corner1"><br>
+            <label for="left-lower-clockwise">Left Lower Corner</label>
+            <input type="radio" class="form-control pull-right" id="left-lower-clockwise" name="corner1"><br>
+            <label for="right-lower-clockwise">Right Lower Corner</label>
+            <input type="radio" class="form-control pull-right" id="right-lower-clockwise" name="corner1">
+            <hr>
+            <label for="from-center-clockwise">From Center</label>
+            <input type="radio" class="form-control pull-right" id="from-center-clockwise" name="corner1"><br>
+        </div>
+        <div class="col-md-3 col-lg-3 col-sm-4">
+            <div class="text-center text-center1">
+                <label>Counter clockwise</label>
+            </div>
+            <label for="left-upper-counterclockwise">Left Upper Corner</label>
+            <input type="radio" class="form-control pull-right" id="left-upper-counterclockwise" name="corner1"><br>
+            <label for="right-upper-counterclockwise">Right Upper Corner</label>
+            <input type="radio" class="form-control pull-right" id="right-upper-counterclockwise" name="corner1"><br>
+            <label for="left-lower-counterclockwise">Left Lower Corner</label>
+            <input type="radio" class="form-control pull-right" id="left-lower-counterclockwise" name="corner1"><br>
+            <label for="right-lower-counterclockwise">Right Lower Corner</label>
+            <input type="radio" class="form-control pull-right" id="right-lower-counterclockwise" name="corner1">
+            <hr>
+            <label for="from-center-counterclockwise">From Center</label>
+            <input type="radio" class="form-control pull-right" id="from-center-counterclockwise" name="corner1"><br>
+        </div>
+    </div>
+    <div class="row">
+        <div class="text-center">
+            <input type="number" class="form-control text-center" max="40" min="4" value="10">
+            <input type="button" class="btn btn-success fill_button" value="Fill The Matrix"/>
+        </div>
+    </div>
+</div>
+<div class="matrix"></div>
+<div class="show-choice text-center">
+    <button class="btn btn-success">Show matrix choices</button>
+</div>
+<script>
+    let i, j, k, l, SIZE;
+    let circle = {};
+
+    $(document).ready(function () {
+        $(".fill_button").click(function () {
+            SIZE = parseInt($("input[type='number']").val());
+            $('.choice').hide();
+            $('.matrix').show().css('width', (SIZE * 50 + 20) + 'px');
+
+            circle.circle = countTurnsElements();
+            createTable(switchMatrixChoice(initMatrix()));
+            drawTable(circle.circle);
+        });
+
+        $('.show-choice button').click(function () {
+            $('.show-choice').hide();
+            $('.matrix').html('').hide();
+            $('.choice').show();
+        });
+    });
+
+    function initMatrix() {
+        let matrix = [];
+        for (i = 0; i < SIZE; i++) {
+            matrix[i] = [];
+            for (j = 0; j < SIZE; j++) {
+                matrix[i][j] = 0;
+            }
+        }
+        return matrix;
+    }
+
+    function switchMatrixChoice(matrix) {
+        let type = $(":checked").attr('id');
+        let index = type === 'left-upper-clockwise' ? ['k', 'i', 'l', 'j', 'i', 'l', 'j', 'k'] :
+            type === 'right-upper-clockwise' ? ['i', 'l', 'j', 'k', 'l', 'j', 'k', 'i'] :
+                type === 'left-lower-clockwise' ? ['j', 'k', 'i', 'l', 'k', 'i', 'l', 'j'] :
+                    type === 'right-lower-clockwise' ? ['l', 'j', 'k', 'i', 'j', 'k', 'i', 'l'] :
+                        type === 'left-upper-counterclockwise' ? ['i', 'k', 'j', 'l', 'l', 'i', 'k', 'j'] :
+                            type === 'right-upper-counterclockwise' ? ['k', 'j', 'l', 'i', 'i', 'k', 'j', 'l'] :
+                                type === 'left-lower-counterclockwise' ? ['l', 'i', 'k', 'j', 'j', 'l', 'i', 'k'] :
+                                    type === 'right-lower-counterclockwise' ? ['j', 'l', 'i', 'k', 'k', 'j', 'l', 'i'] : [];
+        if (index.length !== 0) {
+            matrix = fillMatrix(matrix, index);
+        } else {
+            index = type === 'from-center-clockwise' ? ['l', 'j', 'k', 'i', 'j', 'k', 'i', 'l'] :
+                type === 'from-center-counterclockwise' ? ['k', 'j', 'l', 'i', 'i', 'k', 'j', 'l'] : [];
+
+            let count = 1;
+            if (parseInt(SIZE / 2) === (SIZE / 2)) {
+                matrix[type === 'from-center-clockwise' ? Math.floor(SIZE / 2) : Math.floor(SIZE / 2) - 1][Math.floor(SIZE / 2) - 1] = count;
+                matrix[type === 'from-center-clockwise' ? Math.floor(SIZE / 2) - 1 : Math.floor(SIZE / 2)][Math.floor(SIZE / 2) - 1] = count + 1;
+                matrix[type === 'from-center-clockwise' ? Math.floor(SIZE / 2) - 1 : Math.floor(SIZE / 2)][Math.floor(SIZE / 2)] = count + 2;
+                matrix[type === 'from-center-clockwise' ? Math.floor(SIZE / 2) : Math.floor(SIZE / 2) - 1][Math.floor(SIZE / 2)] = count + 3;
+                count = 5;
+                matrix = fillMatrixFromCenter(matrix, count, 2, index);
+                circle.circle = countTurnsElementsFromCenter(4, 2);
+            } else {
+                matrix[Math.floor(SIZE / 2)][Math.floor(SIZE / 2)] = count;
+                count = 2;
+                matrix = fillMatrixFromCenter(matrix, count, 1, index);
+                circle.circle = countTurnsElementsFromCenter(1, 1,);
+            }
+        }
+        return matrix;
+    }
+
+    function fillMatrix(matrix, index) {
+        let v = [];
+        let count = 1;
+        for (k = 0, l = SIZE - 1; k < Math.floor(SIZE / 2) + 1, l >= Math.floor(SIZE / 2); k++, l--) {
+            for (i = k, j = SIZE - k - 1; i < SIZE - k, j >= k; i++, j--) {
+                for (let n = 0; n < 8; n++) {
+                    v[n + 1] = index[n] === 'k' ? k : index[n] === 'l' ? l : index[n] === 'i' ? i : index[n] === 'j' ? j : 0;
+                }
+                matrix[v[1]][v[2]] = count;
+                matrix[v[3]][v[4]] = (2 * SIZE - 2) - 4 * k + count;
+                if (i > k && i < SIZE - k - 1) {
+                    matrix[v[5]][v[6]] = SIZE + count - 2 * k - 1;
+                    matrix[v[7]][v[8]] = 3 * SIZE + count - 6 * k - 3;
+                }
+                count++;
+            }
+            count += 3 * SIZE - 6 * k - 4;
+        }
+        return matrix;
+    }
+
+    function fillMatrixFromCenter(matrix, count, oddEvenParam, index) {
+        let v = [];
+        for (k = Math.floor(SIZE / 2) - oddEvenParam, l = Math.floor(SIZE / 2) + 1; k >= 0 , l <= SIZE - 1; k--, l++) {
+            for (i = k, j = SIZE - k - 1; i <= SIZE - k - 1, j >= k; i++, j--) {
+                for (let n = 0; n < 8; n++) {
+                    v[n + 1] = index[n] === 'k' ? k : index[n] === 'l' ? l : index[n] === 'i' ? i : index[n] === 'j' ? j : 0;
+                }
+                matrix[v[5]][v[6]] = SIZE + count - 2 * k - 2;
+                matrix[v[7]][v[8]] = 3 * SIZE + count - 6 * k - 4;
+                if (i + 1 > k && i + 1 < SIZE - k - 1) {
+                    matrix[v[1]][v[2] - 1] = count;
+                    matrix[v[3]][v[4] + 1] = (2 * SIZE - 2) - 4 * k + count;
+                }
+                count++;
+            }
+            count += 3 * SIZE - 6 * k - 4;
+        }
+        return matrix;
+    }
+
+    function countTurnsElements() {
+        let circle = [];
+        circle[0] = (SIZE) * 2 + (SIZE - 2) * 2;
+        for (k = 1; k < Math.floor(SIZE / 2); k++) {
+            circle[k] = (SIZE - k * 2) * 2 + (SIZE - k * 2 - 2) * 2 + circle[k - 1];
+        }
+        if (SIZE % 2) {
+            circle[circle.length] = circle[circle.length - 1] + 1;
+        }
+        return circle;
+    }
+
+    function countTurnsElementsFromCenter(circleZero, oddEvenParam) {
+        let circle = [];
+        circle[0] = circleZero;
+        for (k = 1, l = Math.floor(SIZE / 2) - oddEvenParam; k <= Math.floor(SIZE / 2) - 1, l >= 0; k++, l--) {
+            circle[k] = (SIZE - l * 2) * 2 + (SIZE - l * 2 - 2) * 2 + circle[k - 1];
+        }
+        return circle;
+    }
+
+    function createTable(matrix) {
+        let table = "<table class='table'>";
+        let td = "";
+
+        for (i = 0; i < SIZE; i++) {
+            table += "<tr>";
+            for (j = 0; j < SIZE; j++) {
+                td = "<td id=" + matrix[i][j] + " class='number'>" + matrix[i][j] + "</td>";
+                table += td;
+            }
+            table += "</tr>";
+        }
+
+        table += "</table>";
+        $(".matrix").html(table);
+    }
+
+    function checkOddEvenCircle(index, circle) {
+        let oddEven = 0;
+        let circleLength = circle.length;
+
+        if (index > 0 && index <= circle[0]) {
+            oddEven = 1;
+        } else {
+            for (let i = 0; i < circleLength; i++) {
+                if (index > circle[i] && index <= circle[i + 1]) {
+                    oddEven = i;
+                }
+            }
+        }
+        return oddEven % 2 !== 0;
+    }
+
+    function showElement(isOddEven, index) {
+        $("#" + index).css({
+            visibility: 'visible',
+            backgroundColor: isOddEven ? '#2f6bd4' : '#eacd10',
+            color: 'white'
+        }).animate({fontSize: '16px', fontWeight: '700'}, 100);
+    }
+
+    function drawTable(circle) {
+        let counter = 1;
+        const delay = 100;
+
+        for (let i = 0; i < SIZE; i++) {
+            for (let j = 0; j < SIZE; j++) {
+                (function (index) {
+                    setTimeout(function () {
+                        showElement(checkOddEvenCircle(index, circle), index);
+                        if (index >= SIZE * SIZE) {
+                            $('.show-choice').show();
+                        }
+                    }, delay * index);
+                })(counter);
+                counter++;
+            }
+        }
+    }
+</script>
+</body>
+</html>
